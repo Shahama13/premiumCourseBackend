@@ -12,7 +12,7 @@ router.route("/change").put(userAuth, changePassword)
 router.route("/me").get(userAuth, getMyProfile).put(userAuth, singleUpload, updateProfile)
 router.route("/forgot").post(forgotPassword)
 router.route("/reset/:token").put(resetPasword)
-router.route("/addtoplaylist").post(userAuth, addToPlaylist)
+router.route("/addtoplaylist").get(userAuth, addToPlaylist)
 
 // Admin routes
 router.route("/admin/users").get(userAuth, adminAuth, getAllUsers)
