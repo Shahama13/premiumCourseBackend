@@ -63,13 +63,13 @@ export const changePassword = catchAsyncError(async (req, res, next) => {
 })
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {
-    const { name } = req.body
+   
 
     const file = req.file;
 
     const user = await User.findById(req.user._id)
 
-    if (file) {
+   
         if (user.avatar.public_id) {
             await cloudinary.v2.uploader.destroy(user.avatar.public_id)
         }
@@ -79,11 +79,8 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
             public_id: mycloud.public_id,
             url: mycloud.secure_url,
         }
-    }
+    
 
-    if (name) {
-        user.name = name
-    }
     await user.save();
     res.status(200).json({
         success: true,
