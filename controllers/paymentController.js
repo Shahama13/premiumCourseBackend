@@ -72,7 +72,7 @@ export const cancelSubscription = catchAsyncError(async (req, res, next) => {
         refund = true
     }
 
-    await payment.remove();
+    await Payment.findByIdAndDelete(payment._id);
     user.subscription.id = undefined
     user.subscription.status = undefined
     await user.save();
