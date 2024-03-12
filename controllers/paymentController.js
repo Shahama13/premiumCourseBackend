@@ -36,15 +36,15 @@ export const paymentVerification = catchAsyncError(async (req, res, next) => {
         .update(razorpay_payment_id + "|" + subscription_id, "utf-8")
         .digest("hex")
     const isAuthentic = generated_signature === razorpay_signature
-    if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/paymentfail`)
+    if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/fail`)
 
     // database comes here
     await Payment.create({
         razorpay_signature, razorpay_payment_id, razorpay_subscription_id
     })
     user.subscription.status = "active"
-    await user.asve()
-    res.redirect(`${process.env.FRONTEND_URL}/paymentsuccess?reference=${razorpay_payment_id}`)
+    await user.save()
+    res.redirect(`${process.env.FRONTEND_URL}/success?reference=${razorpay_payment_id}`)
 
 })
 
