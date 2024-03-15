@@ -5,7 +5,7 @@ import { buySubscription, cancelSubscription, getRazorpayKey, paymentVerificatio
 const router = express.Router()
 
 // Buy subscription
-router.route("/subscribe").get(userAuth, buySubscription)
+router.route("/subscribe").post(userAuth, buySubscription)
 
 // Verify payment and save refence in databse
 router.route("/paymentverfication").post(userAuth, paymentVerification)
