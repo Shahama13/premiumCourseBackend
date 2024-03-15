@@ -9,7 +9,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    razorpay_subscription_id: {
+    razorpay_order_id: {
         type: String,
         required: true,
     }

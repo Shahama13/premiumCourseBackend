@@ -9,38 +9,37 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
     const user = await User.findById(req.user._id);
     if (user.role === "admin") return next(new ErrorClass("Admin can't subscribe", 400))
 
-    const plan_id = process.env.PLAN_ID || "plan_NjsJFAoe2jhd2P"
-    const subscription = await instance.subscriptions.create({
-        plan_id,
-        customer_notify: 1,
-        total_count: 12,
+    // const plan_id = process.env.PLAN_ID || "plan_NjsJFAoe2jhd2P"
+    const order = await instance.orders.create({
+        amount: Number(req.body.amount * 100),  // amount in the smallest currency unit
+        currency: "INR",
     })
 
-    user.subscription.id = subscription.id;
-    user.subscription.status = subscription.status
+    user.subscription.id = order.id;
+    user.subscription.status = order.status
 
     await user.save();
 
     res.status(201).json({
         success: true,
-        subscriptionId: subscription.id,
+        subscriptionId: order.id,
     })
 })
 
 export const paymentVerification = catchAsyncError(async (req, res, next) => {
-    const { razorpay_signature, razorpay_payment_id, razorpay_subscription_id } = req.body
+    const { razorpay_signature, razorpay_payment_id, razorpay_order_id } = req.body
     const user = await User.findById(req.user._id);
-    const subscription_id = user.subscription.id;
+    const order_id = user.subscription.id;
     const generated_signature = crypto
         .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
-        .update(razorpay_payment_id + "|" + subscription_id, "utf-8")
+        .update(order_id + "|" + razorpay_payment_id, "utf-8")
         .digest("hex")
     const isAuthentic = generated_signature === razorpay_signature
     if (!isAuthentic) return res.redirect(`${process.env.FRONTEND_URL}/fail`)
 
     // database comes here
     await Payment.create({
-        razorpay_signature, razorpay_payment_id, razorpay_subscription_id
+        razorpay_signature, razorpay_payment_id, razorpay_order_id
     })
     user.subscription.status = "active"
     await user.save()
