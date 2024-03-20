@@ -45,11 +45,15 @@ const schema = new mongoose.Schema({
 
     playlist: [
         {
-            course: {
-                type: mongoose.Schema.ObjectId,
-                ref: "Course",
-            },
-            poster: String
+            type: mongoose.Schema.ObjectId,
+            ref: "Course",
+
+        }
+    ],
+    purchases: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "Course",
         }
     ],
 

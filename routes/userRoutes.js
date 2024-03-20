@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, createAccount, forgotPassword, changeRole, getAllUsers, resetPasword, deleteUser, getMyProfile, login, logout, updateProfile, addToPlaylist } from "../controllers/userController.js";
+import { changePassword, createAccount, forgotPassword, changeRole, getAllUsers, resetPasword, getMyProfile, login, logout, updateProfile, addToPlaylist } from "../controllers/userController.js";
 import { adminAuth, userAuth } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
 
@@ -16,6 +16,6 @@ router.route("/addtoplaylist").get(userAuth, addToPlaylist)
 
 // Admin routes
 router.route("/admin/users").get(userAuth, adminAuth, getAllUsers)
-router.route("/admin/user/:id").put(userAuth, adminAuth, changeRole).delete(userAuth,adminAuth,deleteUser)
+router.route("/admin/user/:id").put(userAuth, adminAuth, changeRole)
 
 export default router;

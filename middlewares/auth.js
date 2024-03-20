@@ -24,7 +24,8 @@ export const adminAuth = (req, res, next) => {
 }
 
 export const premiumSubscribers = (req, res, next) => {
-    if (req.user.subscription.status !== "active" && req.user.role !== "admin")
-        return next(new ErrorClass("Subscribe to Premium to access", 403))
-    next()
+    if (!req.user.purchases.includes(req.params.id) && req.user.role !== "admin")
+        return next(new ErrorClass("Purchase this course to access", 403))
+
+    next()    // if (req.user.subscription.status !== "active" && req.user.role !== "admin")
 }

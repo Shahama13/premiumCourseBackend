@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllCourses, createCourse, getCourseLectures, deleteLecture, deleteCourse, addLectures } from "../controllers/courseController.js";
+import { getAllCourses, createCourse, getCourseLectures, deleteLecture, deleteCourse, addLectures, createPurchase, getCourseDetailsWithLecturesNotVideos } from "../controllers/courseController.js";
 import { adminAuth, userAuth, premiumSubscribers } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
 
@@ -12,6 +12,11 @@ router.route("/courses").get(getAllCourses)
 router
     .route("/course")
     .post(userAuth, adminAuth, singleUpload, createCourse)
+
+// Purchase course 
+router.route("/purchase").post(userAuth, createPurchase)
+
+router.route("/courselecture/:id").get(getCourseDetailsWithLecturesNotVideos)
 
 // Add lecture delete course get acourse details
 router

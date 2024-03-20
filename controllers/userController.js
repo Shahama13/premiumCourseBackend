@@ -41,7 +41,7 @@ export const logout = catchAsyncError(async (req, res, next) => {
 })
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).populate({ path: "purchases playlist", select: "-lectures" })
     res.status(200).json({
         success: true,
         user
@@ -63,23 +63,23 @@ export const changePassword = catchAsyncError(async (req, res, next) => {
 })
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {
-   
+
 
     const file = req.file;
 
     const user = await User.findById(req.user._id)
 
-   
-        if (user.avatar.public_id) {
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id)
-        }
-        const fileUri = getDataUri(file)
-        const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, { folder: "course" })
-        user.avatar = {
-            public_id: mycloud.public_id,
-            url: mycloud.secure_url,
-        }
-    
+
+    if (user.avatar.public_id) {
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id)
+    }
+    const fileUri = getDataUri(file)
+    const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, { folder: "course" })
+    user.avatar = {
+        public_id: mycloud.public_id,
+        url: mycloud.secure_url,
+    }
+
 
     await user.save();
     res.status(200).json({
@@ -129,16 +129,13 @@ export const addToPlaylist = catchAsyncError(async (req, res, next) => {
     const course = await Course.findById(req.query.id)
     if (!course) return next(new ErrorClass("Invalid Course Id", 404))
 
-    const itemExists = user.playlist.find((item) => {
-        if (item.course.toString() === req.query.id.toString())
-            return true;
-    })
+    // const itemExists = user.playlist.find((item) => {
+    //     if (item.course.toString() === req.query.id.toString())
+    //         return true;
+    // })
 
-    if (!itemExists) {
-        user.playlist.unshift({
-            course: course._id,
-            poster: course.poster.url
-        })
+    if (!user.playlist.includes(req.query.id)) {
+        user.playlist.unshift(course._id)
         await user.save();
         res.status(200).json({
             success: true,
@@ -146,7 +143,7 @@ export const addToPlaylist = catchAsyncError(async (req, res, next) => {
         })
     }
     else {
-        const latest = user.playlist.filter((item) => item.course.toString() !== course._id.toString())
+        const latest = user.playlist.filter((item) => item.toString() !== course._id.toString())
 
         user.playlist = latest
         await user.save()
@@ -179,18 +176,5 @@ export const changeRole = catchAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: `User role changed to ${user.role}`
-    })
-})
-
-export const deleteUser = catchAsyncError(async (req, res, next) => {
-    const user = await User.findByIdAndDelete(req.params.id)
-    if (!user) return next(new ErrorClass("User not found", 404))
-    if (user.avatar.public_id) {
-        await cloudinary.v2.uploader.destroy(user.avatar.public_id)
-    }
-    // Cancel subscription
-    res.status(200).json({
-        success: true,
-        message: "User deleted"
     })
 })
