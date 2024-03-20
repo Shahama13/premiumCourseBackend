@@ -42,6 +42,7 @@ export const paymentVerification = catchAsyncError(async (req, res, next) => {
         razorpay_signature, razorpay_payment_id, razorpay_order_id
     })
     user.subscription.status = "active"
+    user.purchases.unshift(user.subscription.id.split("+")[1])
     await user.save()
     res.redirect(`${process.env.FRONTEND_URL}/profile`)
 
