@@ -41,7 +41,23 @@ export const logout = catchAsyncError(async (req, res, next) => {
 })
 
 export const getMyProfile = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id).populate({ path: "purchases playlist", select: "-lectures" })
+    const user = await User.findById(req.user._id)
+        .populate({
+            path: "purchases",
+            populate: {
+                path: "createdBy",
+                select:"avatar name email"
+            },
+            select: "-lectures"
+        })
+        .populate({
+            path: "playlist",
+            populate: {
+                path: "createdBy"  ,             
+                select:"avatar name email",
+            },
+            select: "-lectures"
+        })
     res.status(200).json({
         success: true,
         user
