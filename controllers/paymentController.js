@@ -15,7 +15,7 @@ export const buySubscription = catchAsyncError(async (req, res, next) => {
         currency: "INR",
     })
 
-    user.subscription.id = order.id;
+    user.subscription.id = `${order.id}+${req.body.courseId}`;
     user.subscription.status = order.status
 
     await user.save();
