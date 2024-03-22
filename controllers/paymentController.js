@@ -6,8 +6,10 @@ import crypto from "crypto"
 import Payment from "../models/Payment.js"
 
 export const buySubscription = catchAsyncError(async (req, res, next) => {
+
     const user = await User.findById(req.user._id);
     if (user.role === "admin") return next(new ErrorClass("Admin can't subscribe", 400))
+    if (user.purchases && user.purchases.includes(req.body.courseId)) return next(new ErrorClass("Course already in purchase!", 400));
 
     // const plan_id = process.env.PLAN_ID || "plan_NjsJFAoe2jhd2P"
     const order = await instance.orders.create({
